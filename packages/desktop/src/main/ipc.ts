@@ -148,6 +148,8 @@ export function registerIpcHandlers(): void {
         mode: { schema: args.schema, data: args.data },
         filter: { include: args.include ?? [], exclude: args.exclude ?? [], ignoreColumns: args.ignoreColumns },
         onProgress: push,
+        tableTimeout: 120_000,
+        queryTimeout: 30_000,
       });
       push(`✓ Fertig — ${plan.schema.length} Schema-, ${plan.data.length} Daten-Statement(s)`);
       return safePlan(plan);

@@ -18,6 +18,10 @@ export interface BuildPlanOptions {
   mode: { schema: boolean; data: boolean };
   filter?: TableFilter;
   onProgress?: (msg: string) => void;
+  /** Per-table data diff timeout in ms (default: 120 000). */
+  tableTimeout?: number;
+  /** Per-query mysql2 timeout in ms (default: 30 000). */
+  queryTimeout?: number;
 }
 
 export async function buildPlan(
@@ -36,6 +40,18 @@ export async function buildPlan(
   };
 
   const log = opts.onProgress ?? (() => {});
+  const tableTimeout = opts.tableTimeout ?? 120_000;
+  const queryTimeout = opts.queryTimeout ?? 30_000;
+
+  // Healthcheck both connections before doing any work
+  await Promise.all([
+    sourcePool.query({ sql: "SELECT 1", timeout: 10_000 }).catch((e) => {
+      throw new Error(`Quell-Datenbank nicht erreichbar: ${(e as Error).message}`);
+    }),
+    targetPool.query({ sql: "SELECT 1", timeout: 10_000 }).catch((e) => {
+      throw new Error(`Ziel-Datenbank nicht erreichbar: ${(e as Error).message}`);
+    }),
+  ]);
 
   log(`Verbinde und lese Schema: ${sourceDatabase} …`);
   const srcSnap = await introspect(sourcePool, sourceDatabase);
@@ -67,15 +83,34 @@ export async function buildPlan(
         continue;
       }
       log(`  ${t}: vergleiche Zeilen …`);
-      const cols = src.columns.map((c) => c.name);
-      const stmts = await diffTableData(sourcePool, targetPool, {
-        sourceDatabase,
-        targetDatabase,
-        table: t,
-        primaryKey: src.primaryKey,
-        columns: cols,
-        ignoreColumns: opts.filter?.ignoreColumns,
-      });
+      const tgt = tgtSnap.tables.get(t)!;
+      const tgtColSet = new Set(tgt.columns.map((c) => c.name));
+      const cols = src.columns.map((c) => c.name).filter((n) => tgtColSet.has(n));
+      if (cols.length === 0 || !src.primaryKey.every((k) => tgtColSet.has(k))) {
+        log(`  ${t}: übersprungen (Spalten-Schema zu unterschiedlich)`);
+        continue;
+      }
+      let stmts: Awaited<ReturnType<typeof diffTableData>>;
+      try {
+        const timeoutMs = tableTimeout;
+        stmts = await Promise.race([
+          diffTableData(sourcePool, targetPool, {
+            sourceDatabase,
+            targetDatabase,
+            table: t,
+            primaryKey: src.primaryKey,
+            columns: cols,
+            ignoreColumns: opts.filter?.ignoreColumns,
+            queryTimeout,
+          }),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`Timeout nach ${timeoutMs / 1000}s`)), timeoutMs),
+          ),
+        ]);
+      } catch (e) {
+        log(`  ${t}: übersprungen — ${(e as Error).message}`);
+        continue;
+      }
       for (const s of stmts) plan.data.push(s);
       log(`  ${t}: ${stmts.length} Änderung(en)`);
     }

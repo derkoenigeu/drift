@@ -21,7 +21,7 @@ function createWindow(): void {
   if (devUrl) win.loadURL(devUrl);
   else win.loadFile(join(__dirname, "..", "renderer", "index.html"));
 
-  win.webContents.openDevTools({ mode: "detach" });
+  if (!app.isPackaged) win.webContents.openDevTools({ mode: "detach" });
   win.webContents.on("render-process-gone", (_e, details) => {
     console.error("[renderer gone]", details);
   });
