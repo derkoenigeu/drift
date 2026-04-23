@@ -143,15 +143,16 @@ jobs:
 
             | Platform | Installer |
             |----------|-----------|
-            | **macOS** | `Drift-${{ steps.version.outputs.num }}.dmg` |
-            | **Windows** | `Drift-${{ steps.version.outputs.num }}.exe` |
-            | **Linux** | `Drift-${{ steps.version.outputs.num }}.AppImage` · `Drift-${{ steps.version.outputs.num }}.deb` |
+            | **macOS (Apple Silicon)** | `Drift-${{ steps.version.outputs.num }}-arm64.dmg` |
+            | **macOS (Intel)** | `Drift-${{ steps.version.outputs.num }}-x64.dmg` |
+            | **Windows** | `Drift-${{ steps.version.outputs.num }}-x64.exe` |
+            | **Linux** | `Drift-${{ steps.version.outputs.num }}-x86_64.AppImage` · `Drift-${{ steps.version.outputs.num }}-amd64.deb` |
 
             > **macOS note:** Drift is not yet code-signed. If macOS says the app is "damaged":
             > 1. Open the DMG and drag **Drift** to `/Applications`
-            > 2. Run in Terminal:
+            > 2. Remove the quarantine flag (run in Terminal):
             > ```bash
-            > xattr -d com.apple.quarantine /Applications/Drift.app
+            > xattr -rd com.apple.quarantine /Applications/Drift.app
             > ```
             > 3. If still blocked, re-sign locally:
             > ```bash

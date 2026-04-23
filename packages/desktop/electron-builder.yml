@@ -1,6 +1,6 @@
 appId: de.mindbox.drift
 productName: Drift
-artifactName: "${productName}-${version}.${ext}"
+artifactName: "${productName}-${version}-${arch}.${ext}"
 directories:
   output: release
 files:
@@ -11,7 +11,10 @@ mac:
   identity: null
   hardenedRuntime: false
   target:
-    - dmg
+    - target: dmg
+      arch:
+        - arm64
+        - x64
   category: public.app-category.developer-tools
 win:
   icon: build/icon.ico
