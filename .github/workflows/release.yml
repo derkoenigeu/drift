@@ -147,6 +147,12 @@ jobs:
             | **Windows** | `Drift-${{ steps.version.outputs.num }}.exe` |
             | **Linux** | `Drift-${{ steps.version.outputs.num }}.AppImage` · `Drift-${{ steps.version.outputs.num }}.deb` |
 
+            > **macOS note:** Drift is not yet code-signed. If macOS says the app is "damaged", run this once in Terminal before opening:
+            > ```bash
+            > xattr -cr ~/Downloads/Drift-${{ steps.version.outputs.num }}.dmg
+            > ```
+            > Then open the DMG again. Alternatively: System Settings → Privacy & Security → Open Anyway.
+
             ## Upgrading
 
             Simply download and run the new installer. Your vault and saved connections are preserved automatically.
