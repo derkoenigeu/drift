@@ -2,15 +2,27 @@ changelog:
   exclude:
     labels:
       - ignore-for-release
+      - chore
   categories:
-    - title: "What's new"
+    - title: "✨ New Features & Improvements"
       labels:
         - enhancement
         - feature
-    - title: Bug Fixes
+        - improvement
+    - title: "🐛 Bug Fixes"
       labels:
         - bug
         - fix
-    - title: Other Changes
+    - title: "🔒 Security"
+      labels:
+        - security
+    - title: "📦 Dependencies"
+      labels:
+        - dependencies
+        - deps
+    - title: "📖 Documentation"
+      labels:
+        - documentation
+    - title: "🔧 Maintenance"
       labels:
         - "*"
