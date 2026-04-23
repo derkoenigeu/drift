@@ -1,8 +1,9 @@
 node_modules/
 dist/
-build/
 out/
 release/
+# only the generated iconset dir inside build, not build itself
+packages/desktop/build/icon.iconset/
 *.log
 .DS_Store
 .env
@@ -12,6 +13,5 @@ vault.db-mirror
 coverage/
 .vite/
 .turbo/
-repomix-output.md
 repomix-output.md
 tsconfig.tsbuildinfo

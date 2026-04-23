@@ -1,5 +1,5 @@
-appId: de.mindbox.dbmirror
-productName: DB-Mirror
+appId: de.mindbox.drift
+productName: Drift
 artifactName: "${productName}-${version}.${ext}"
 directories:
   output: release
@@ -7,14 +7,17 @@ files:
   - dist/**
   - package.json
 mac:
+  icon: build/icon.icns
   target:
     - dmg
   category: public.app-category.developer-tools
 win:
+  icon: build/icon.ico
   target:
     - nsis
 linux:
-  executableName: db-mirror
+  icon: build/icon.png
+  executableName: drift
   target:
     - AppImage
     - deb

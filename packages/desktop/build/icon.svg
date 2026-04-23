@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e"/>
+      <stop offset="100%" style="stop-color:#16213e"/>
+    </linearGradient>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6c63ff"/>
+      <stop offset="100%" style="stop-color:#3ecfcf"/>
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3ecfcf"/>
+      <stop offset="100%" style="stop-color:#6c63ff"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background rounded rect -->
+  <rect width="1024" height="1024" rx="220" ry="220" fill="url(#bg)"/>
+
+  <!-- Left database cylinder -->
+  <ellipse cx="300" cy="310" rx="130" ry="38" fill="url(#grad1)" opacity="0.9"/>
+  <rect x="170" y="310" width="260" height="200" fill="url(#grad1)" opacity="0.75"/>
+  <ellipse cx="300" cy="510" rx="130" ry="38" fill="url(#grad1)" opacity="0.9"/>
+  <!-- cylinder lid lines -->
+  <ellipse cx="300" cy="377" rx="130" ry="38" fill="none" stroke="#3ecfcf" stroke-width="4" opacity="0.4"/>
+  <ellipse cx="300" cy="443" rx="130" ry="38" fill="none" stroke="#3ecfcf" stroke-width="4" opacity="0.4"/>
+
+  <!-- Right database cylinder -->
+  <ellipse cx="724" cy="410" rx="130" ry="38" fill="url(#grad2)" opacity="0.9"/>
+  <rect x="594" y="410" width="260" height="200" fill="url(#grad2)" opacity="0.75"/>
+  <ellipse cx="724" cy="610" rx="130" ry="38" fill="url(#grad2)" opacity="0.9"/>
+  <!-- cylinder lid lines -->
+  <ellipse cx="724" cy="477" rx="130" ry="38" fill="none" stroke="#6c63ff" stroke-width="4" opacity="0.4"/>
+  <ellipse cx="724" cy="543" rx="130" ry="38" fill="none" stroke="#6c63ff" stroke-width="4" opacity="0.4"/>
+
+  <!-- Drift wave / arrow connecting them -->
+  <path d="M 430 460 C 490 380, 560 540, 595 460"
+        fill="none" stroke="url(#grad1)" stroke-width="18" stroke-linecap="round" filter="url(#glow)" opacity="0.95"/>
+  <!-- Arrow head -->
+  <polygon points="590,435 615,460 590,485" fill="#3ecfcf" filter="url(#glow)"/>
+
+  <!-- Small decorative dots -->
+  <circle cx="512" cy="720" r="12" fill="#6c63ff" opacity="0.6"/>
+  <circle cx="552" cy="720" r="8" fill="#3ecfcf" opacity="0.4"/>
+  <circle cx="472" cy="720" r="8" fill="#3ecfcf" opacity="0.4"/>
+
+  <!-- Wordmark "drift" -->
+  <text x="512" y="870" font-family="'SF Pro Display', 'Helvetica Neue', Arial, sans-serif"
+        font-size="110" font-weight="700" letter-spacing="-2"
+        text-anchor="middle" fill="white" opacity="0.92">drift</text>
+</svg>

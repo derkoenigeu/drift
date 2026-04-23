@@ -143,9 +143,9 @@ jobs:
 
             | Platform | Installer |
             |----------|-----------|
-            | **macOS** | `DB-Mirror-${{ steps.version.outputs.num }}.dmg` |
-            | **Windows** | `DB-Mirror-${{ steps.version.outputs.num }}.exe` |
-            | **Linux** | `DB-Mirror-${{ steps.version.outputs.num }}.AppImage` · `DB-Mirror-${{ steps.version.outputs.num }}.deb` |
+            | **macOS** | `Drift-${{ steps.version.outputs.num }}.dmg` |
+            | **Windows** | `Drift-${{ steps.version.outputs.num }}.exe` |
+            | **Linux** | `Drift-${{ steps.version.outputs.num }}.AppImage` · `Drift-${{ steps.version.outputs.num }}.deb` |
 
             ## Upgrading
 

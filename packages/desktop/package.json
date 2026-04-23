@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "MySQL & MariaDB schema and data sync — desktop app",
+  "description": "Drift — MySQL & MariaDB schema and data sync desktop app",
   "homepage": "https://github.com/derkoenigeu/drift",
   "author": {
     "name": "derkoenigeu",
