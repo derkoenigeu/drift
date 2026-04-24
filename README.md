@@ -174,7 +174,7 @@ git push origin v1.2.3
 
 ## License
 
-MIT © your-org
+MIT © zebra group GmbH
 
 ---
 
