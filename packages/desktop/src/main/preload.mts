@@ -12,9 +12,17 @@ const ALLOWED_PUSH_CHANNELS = [
 ] as const;
 type PushChannel = (typeof ALLOWED_PUSH_CHANNELS)[number];
 
+const ALLOWED_SEND_CHANNELS = [
+  IPC.WindowClose,
+  IPC.WindowMinimize,
+  IPC.WindowMaximize,
+] as const;
+type SendChannel = (typeof ALLOWED_SEND_CHANNELS)[number];
+
 const api = {
   invoke: <T = unknown,>(channel: string, payload?: unknown): Promise<T> =>
     ipcRenderer.invoke(channel, payload) as Promise<T>,
+  send: (channel: SendChannel) => ipcRenderer.send(channel),
   on: (channel: PushChannel, listener: (payload: unknown) => void) => {
     const wrapped = (_event: Electron.IpcRendererEvent, payload: unknown) => listener(payload);
     ipcRenderer.on(channel, wrapped);

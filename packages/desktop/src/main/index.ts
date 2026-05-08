@@ -10,6 +10,7 @@ function createWindow(): void {
   const win = new BrowserWindow({
     width: 1280,
     height: 820,
+    frame: false,
     webPreferences: {
       preload: join(__dirname, "preload.mjs"),
       contextIsolation: true,

@@ -22,6 +22,8 @@ async function lock() {
   unlocked.value = false;
 }
 
+const appVersion = ref("");
+
 type UpdateState = "idle" | "downloading" | "ready";
 const updateState     = ref<UpdateState>("idle");
 const updateVersion   = ref("");
@@ -29,6 +31,7 @@ const updatePercent   = ref(0);
 const updateDismissed = ref(false);
 
 onMounted(() => {
+  rpc.appVersion().then((v) => { appVersion.value = v; });
   const unsubs = [
     rpc.onUpdateAvailable(({ version }) => {
       updateVersion.value = version;
@@ -62,11 +65,15 @@ window.addEventListener("keydown", onKeyDown);
   <UnlockView v-if="!unlocked" @unlocked="unlocked = true" />
   <div v-else class="shell">
     <header class="titlebar">
-      <div class="traffic"><span /><span /><span /></div>
+      <div class="traffic">
+        <span class="btn-close" @click="rpc.windowClose()" title="Schließen" />
+        <span class="btn-min"   @click="rpc.windowMinimize()" title="Minimieren" />
+        <span class="btn-max"   @click="rpc.windowMaximize()" title="Maximieren" />
+      </div>
       <div class="brand">
         <span class="brandmark" />
-        <strong>DB-Mirror</strong>
-        <span class="muted ver">v0.4.2</span>
+        <strong>Drift</strong>
+        <span class="muted ver">v{{ appVersion }}</span>
       </div>
       <div class="sep" />
       <nav>
@@ -113,11 +120,13 @@ window.addEventListener("keydown", onKeyDown);
 <style scoped>
 .shell { display: flex; flex-direction: column; height: 100vh; }
 .main { flex: 1; overflow: hidden; }
+.titlebar { -webkit-app-region: drag; }
+.titlebar button, .titlebar .traffic { -webkit-app-region: no-drag; }
 .traffic { display: flex; gap: 7px; padding-right: 6px; }
-.traffic span { width: 11px; height: 11px; border-radius: 50%; display: inline-block; }
-.traffic span:nth-child(1) { background: #ff5f57; }
-.traffic span:nth-child(2) { background: #febc2e; }
-.traffic span:nth-child(3) { background: #28c840; }
+.traffic span { width: 11px; height: 11px; border-radius: 50%; display: inline-block; cursor: default; }
+.btn-close { background: #ff5f57; }
+.btn-min   { background: #febc2e; }
+.btn-max   { background: #28c840; }
 .brand { display: inline-flex; gap: 7px; align-items: center; font: 600 12px/1 var(--font-ui); color: var(--text-dim); }
 .ver { font-weight: 400; margin-left: 2px; font-size: 11.5px; }
 .sep { width: 1px; align-self: stretch; background: var(--hairline); margin: 0 4px; }

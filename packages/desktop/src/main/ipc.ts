@@ -1,4 +1,4 @@
-import { ipcMain, dialog } from "electron";
+import { ipcMain, dialog, app, BrowserWindow } from "electron";
 import updaterPkg from "electron-updater";
 const { autoUpdater } = updaterPkg;
 import { homedir } from "node:os";
@@ -53,6 +53,10 @@ function safePlan(plan: import("@db-mirror/core").SyncPlan): import("@db-mirror/
 
 export function registerIpcHandlers(): void {
   ipcMain.handle(IPC.DefaultVaultPath, () => defaultVaultPath());
+  ipcMain.handle(IPC.AppVersion, () => app.getVersion());
+  ipcMain.on(IPC.WindowClose,    (e) => BrowserWindow.fromWebContents(e.sender)?.close());
+  ipcMain.on(IPC.WindowMinimize, (e) => BrowserWindow.fromWebContents(e.sender)?.minimize());
+  ipcMain.on(IPC.WindowMaximize, (e) => { const w = BrowserWindow.fromWebContents(e.sender); w?.isMaximized() ? w.unmaximize() : w?.maximize(); });
 
   ipcMain.handle(IPC.VaultExists, async (_e, path?: string) => Vault.exists(path ?? defaultVaultPath()));
 

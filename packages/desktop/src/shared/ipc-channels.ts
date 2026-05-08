@@ -30,6 +30,10 @@ export const IPC = {
   UpdateDownloaded:       "update:downloaded",
   UpdateError:            "update:error",
   InstallUpdate:          "update:install",
+  AppVersion:             "app:version",
+  WindowClose:            "window:close",
+  WindowMinimize:         "window:minimize",
+  WindowMaximize:         "window:maximize",
 } as const;
 
 export type IpcChannel = (typeof IPC)[keyof typeof IPC];

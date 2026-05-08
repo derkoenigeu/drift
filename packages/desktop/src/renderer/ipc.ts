@@ -7,6 +7,7 @@ export type UpdateDownloadedInfo = { version: string };
 
 const api = () => (window as unknown as { dbMirror: {
   invoke: <T>(c: string, p?: unknown) => Promise<T>;
+  send: (channel: string) => void;
   on: (channel: string, cb: (payload: unknown) => void) => (...args: unknown[]) => void;
   off: (channel: string, wrapped: (...args: unknown[]) => void) => void;
 } }).dbMirror;
@@ -77,4 +78,8 @@ export const rpc = {
     return () => api().off(IPC.UpdateError, wrapped);
   },
   installUpdate: () => api().invoke<void>(IPC.InstallUpdate),
+  appVersion: () => api().invoke<string>(IPC.AppVersion),
+  windowClose: () => api().send(IPC.WindowClose),
+  windowMinimize: () => api().send(IPC.WindowMinimize),
+  windowMaximize: () => api().send(IPC.WindowMaximize),
 };
