@@ -8,6 +8,7 @@
   "scripts": {
     "build": "pnpm -r build",
     "test": "pnpm -r test",
+    "test:integration": "pnpm --filter @db-mirror/core test:integration",
     "typecheck": "pnpm -r typecheck",
     "cli": "pnpm --filter @db-mirror/cli start",
     "desktop:dev": "pnpm --filter @db-mirror/desktop dev"
