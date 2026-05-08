@@ -37,4 +37,5 @@ export function initUpdater(win: BrowserWindow): void {
   });
 
   setTimeout(() => autoUpdater.checkForUpdates().catch(() => {}), 3000);
+  setInterval(() => autoUpdater.checkForUpdates().catch(() => {}), 5 * 60 * 1000);
 }
