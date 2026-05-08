@@ -2,6 +2,7 @@ import { app, BrowserWindow } from "electron";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { registerIpcHandlers } from "./ipc.js";
+import { initUpdater } from "./updater.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -21,7 +22,7 @@ function createWindow(): void {
   if (devUrl) win.loadURL(devUrl);
   else win.loadFile(join(__dirname, "..", "renderer", "index.html"));
 
-  if (!app.isPackaged) win.webContents.openDevTools({ mode: "detach" });
+  if (!app.isPackaged && !process.env.PLAYWRIGHT_TEST) win.webContents.openDevTools({ mode: "detach" });
   win.webContents.on("render-process-gone", (_e, details) => {
     console.error("[renderer gone]", details);
   });
@@ -30,6 +31,10 @@ function createWindow(): void {
   });
   win.webContents.on("did-fail-load", (_e, code, desc, url) => {
     console.error(`[did-fail-load] ${code} ${desc} url=${url}`);
+  });
+
+  win.webContents.once("did-finish-load", () => {
+    if (app.isPackaged) initUpdater(win);
   });
 }
 

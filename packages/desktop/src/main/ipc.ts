@@ -1,4 +1,6 @@
 import { ipcMain, dialog } from "electron";
+import updaterPkg from "electron-updater";
+const { autoUpdater } = updaterPkg;
 import { homedir } from "node:os";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
@@ -217,5 +219,9 @@ export function registerIpcHandlers(): void {
     await dumpToFile(profile, args.database, outputPath, {}, push);
     push(`✓ Dump saved to ${outputPath}`);
     return outputPath;
+  });
+
+  ipcMain.handle(IPC.InstallUpdate, () => {
+    autoUpdater.quitAndInstall(false, true);
   });
 }

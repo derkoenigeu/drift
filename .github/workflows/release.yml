@@ -91,6 +91,7 @@ jobs:
         run: pnpm --filter @db-mirror/desktop run package
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: "false"
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: List release output
         shell: bash
@@ -105,63 +106,52 @@ jobs:
             packages/desktop/release/*.exe
             packages/desktop/release/*.AppImage
             packages/desktop/release/*.deb
+            packages/desktop/release/*.zip
+            packages/desktop/release/*.blockmap
+            packages/desktop/release/latest*.yml
           if-no-files-found: error
 
   release:
-    name: Create GitHub Release
+    name: Publish GitHub Release
     needs: build
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: dist
-          merge-multiple: true
-
-      - name: List artifacts
-        run: ls -lh dist/
 
       - name: Extract version
         id: version
         run: echo "num=${GITHUB_REF_NAME#v}" >> $GITHUB_OUTPUT
 
-      - name: Publish release
-        uses: softprops/action-gh-release@v2
-        with:
-          generate_release_notes: true
-          fail_on_unmatched_files: true
-          files: dist/*
-          body: |
-            ## Installation
+      - name: Finalize release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release edit "$GITHUB_REF_NAME" \
+            --draft=false \
+            --notes "## Installation
 
-            Download the installer for your platform from the assets below.
+          Download the installer for your platform from the assets below.
 
-            | Platform | Installer |
-            |----------|-----------|
-            | **macOS (Apple Silicon)** | `Drift-${{ steps.version.outputs.num }}-arm64.dmg` |
-            | **macOS (Intel)** | `Drift-${{ steps.version.outputs.num }}-x64.dmg` |
-            | **Windows** | `Drift-${{ steps.version.outputs.num }}-x64.exe` |
-            | **Linux** | `Drift-${{ steps.version.outputs.num }}-x86_64.AppImage` · `Drift-${{ steps.version.outputs.num }}-amd64.deb` |
+          | Platform | Installer |
+          |----------|-----------|
+          | **macOS (Apple Silicon)** | \`Drift-${{ steps.version.outputs.num }}-arm64.dmg\` |
+          | **macOS (Intel)** | \`Drift-${{ steps.version.outputs.num }}-x64.dmg\` |
+          | **Windows** | \`Drift-${{ steps.version.outputs.num }}-x64.exe\` |
+          | **Linux** | \`Drift-${{ steps.version.outputs.num }}-x86_64.AppImage\` · \`Drift-${{ steps.version.outputs.num }}-amd64.deb\` |
 
-            > **macOS note:** Drift is not yet code-signed. If macOS says the app is "damaged":
-            > 1. Open the DMG and drag **Drift** to `/Applications`
-            > 2. Remove the quarantine flag (run in Terminal):
-            > ```bash
-            > xattr -rd com.apple.quarantine /Applications/Drift.app
-            > ```
-            > 3. If still blocked, re-sign locally:
-            > ```bash
-            > sudo codesign --force --deep --sign - /Applications/Drift.app
-            > ```
-            > Then open Drift normally from Applications.
+          > **macOS note:** Drift is not yet code-signed. If macOS says the app is \"damaged\":
+          > 1. Open the DMG and drag **Drift** to \`/Applications\`
+          > 2. Remove the quarantine flag (run in Terminal):
+          > \`\`\`bash
+          > xattr -rd com.apple.quarantine /Applications/Drift.app
+          > \`\`\`
+          > 3. If still blocked, re-sign locally:
+          > \`\`\`bash
+          > sudo codesign --force --deep --sign - /Applications/Drift.app
+          > \`\`\`
+          > Then open Drift normally from Applications.
 
-            ## Upgrading
+          ## Upgrading
 
-            Simply download and run the new installer. Your vault and saved connections are preserved automatically.
-
-            ---
+          The app updates itself automatically. You can also download and run the new installer manually — your vault and saved connections are preserved."

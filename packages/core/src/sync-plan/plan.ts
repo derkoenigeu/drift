@@ -179,7 +179,7 @@ function fkToSql(fk: FkInfo): string {
 const INSERT_BATCH_SIZE = 500;
 
 /** Merges consecutive INSERT statements for the same table into multi-row INSERTs. */
-function batchInserts(data: DataStatement[]): DataStatement[] {
+export function batchInserts(data: DataStatement[]): DataStatement[] {
   const result: DataStatement[] = [];
   let i = 0;
   while (i < data.length) {

@@ -16,6 +16,10 @@ mac:
       arch:
         - arm64
         - x64
+    - target: zip
+      arch:
+        - arm64
+        - x64
   category: public.app-category.developer-tools
 win:
   icon: build/icon.ico
@@ -27,3 +31,7 @@ linux:
   target:
     - AppImage
     - deb
+
+publish:
+  provider: github
+  releaseType: draft
