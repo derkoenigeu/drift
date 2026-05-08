@@ -1,7 +1,15 @@
 import { contextBridge, ipcRenderer } from "electron";
 import { IPC } from "../shared/ipc-channels.js";
 
-const ALLOWED_PUSH_CHANNELS = [IPC.DiffProgress, IPC.DumpProgress, IPC.ApplyProgress] as const;
+const ALLOWED_PUSH_CHANNELS = [
+  IPC.DiffProgress,
+  IPC.DumpProgress,
+  IPC.ApplyProgress,
+  IPC.UpdateAvailable,
+  IPC.UpdateDownloadProgress,
+  IPC.UpdateDownloaded,
+  IPC.UpdateError,
+] as const;
 type PushChannel = (typeof ALLOWED_PUSH_CHANNELS)[number];
 
 const api = {

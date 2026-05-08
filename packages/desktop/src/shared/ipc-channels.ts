@@ -25,6 +25,11 @@ export const IPC = {
   DumpToFile: "dump:toFile",
   DumpProgress: "dump:progress",
   DefaultVaultPath: "paths:defaultVault",
+  UpdateAvailable:        "update:available",
+  UpdateDownloadProgress: "update:downloadProgress",
+  UpdateDownloaded:       "update:downloaded",
+  UpdateError:            "update:error",
+  InstallUpdate:          "update:install",
 } as const;
 
 export type IpcChannel = (typeof IPC)[keyof typeof IPC];

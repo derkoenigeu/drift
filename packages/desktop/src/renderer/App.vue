@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref, watch, onMounted, onUnmounted } from "vue";
 import { rpc } from "./ipc.js";
 import UnlockView from "./views/UnlockView.vue";
 import ConnectionsView from "./views/ConnectionsView.vue";
@@ -21,6 +21,33 @@ async function lock() {
   await rpc.vaultLock();
   unlocked.value = false;
 }
+
+type UpdateState = "idle" | "downloading" | "ready";
+const updateState     = ref<UpdateState>("idle");
+const updateVersion   = ref("");
+const updatePercent   = ref(0);
+const updateDismissed = ref(false);
+
+onMounted(() => {
+  const unsubs = [
+    rpc.onUpdateAvailable(({ version }) => {
+      updateVersion.value = version;
+      updateState.value = "downloading";
+      updateDismissed.value = false;
+    }),
+    rpc.onUpdateDownloadProgress(({ percent }) => {
+      updatePercent.value = percent;
+    }),
+    rpc.onUpdateDownloaded(({ version }) => {
+      updateVersion.value = version;
+      updateState.value = "ready";
+    }),
+    rpc.onUpdateError(() => {
+      updateState.value = "idle";
+    }),
+  ];
+  onUnmounted(() => unsubs.forEach((u) => u()));
+});
 
 // Keyboard: ⌘/Ctrl+1 connections, ⌘/Ctrl+2 workbench
 function onKeyDown(e: KeyboardEvent) {
@@ -62,6 +89,20 @@ window.addEventListener("keydown", onKeyDown);
         </button>
       </div>
     </header>
+    <div v-if="updateState !== 'idle' && !updateDismissed" class="update-banner" role="status">
+      <template v-if="updateState === 'downloading'">
+        <span>Downloading v{{ updateVersion }}…</span>
+        <div class="update-progress">
+          <div class="update-progress-fill" :style="{ width: updatePercent + '%' }" />
+        </div>
+        <span class="muted">{{ updatePercent }}%</span>
+      </template>
+      <template v-else>
+        <span><strong>v{{ updateVersion }}</strong> ready to install</span>
+        <button class="btn sm primary" @click="rpc.installUpdate()">Restart &amp; Update</button>
+      </template>
+      <button class="btn ghost sm" @click="updateDismissed = true">✕</button>
+    </div>
     <main class="main">
       <ConnectionsView v-if="tab === 'connections'" />
       <WorkbenchView v-else />
@@ -80,4 +121,22 @@ window.addEventListener("keydown", onKeyDown);
 .brand { display: inline-flex; gap: 7px; align-items: center; font: 600 12px/1 var(--font-ui); color: var(--text-dim); }
 .ver { font-weight: 400; margin-left: 2px; font-size: 11.5px; }
 .sep { width: 1px; align-self: stretch; background: var(--hairline); margin: 0 4px; }
+.update-banner {
+  display: flex; align-items: center; gap: 10px;
+  padding: 5px 14px; flex-shrink: 0;
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg));
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 20%, transparent);
+  font: 500 12px/1 var(--font-ui); color: var(--text-dim);
+}
+.update-banner strong { color: var(--accent); }
+.update-progress {
+  flex: 1; height: 4px; background: var(--hairline);
+  border-radius: 2px; overflow: hidden; min-width: 80px;
+}
+.update-progress-fill {
+  height: 100%; background: var(--accent);
+  border-radius: 2px; transition: width 0.3s ease;
+}
+.update-banner .btn { margin-left: auto; }
+.update-banner .btn + .btn { margin-left: 0; }
 </style>

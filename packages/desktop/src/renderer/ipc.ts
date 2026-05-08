@@ -1,4 +1,9 @@
 import { IPC } from "../shared/ipc-channels.js";
+import type { docker as dockerTypes } from "@db-mirror/core";
+
+export type UpdateAvailableInfo  = { version: string; releaseNotes: string };
+export type UpdateProgressInfo   = { percent: number; bytesPerSecond: number; transferred: number; total: number };
+export type UpdateDownloadedInfo = { version: string };
 
 const api = () => (window as unknown as { dbMirror: {
   invoke: <T>(c: string, p?: unknown) => Promise<T>;
@@ -28,7 +33,7 @@ export const rpc = {
   k8sSecretKeys: (args: { context: string; namespace: string; secretName: string; kubeconfig?: string }) =>
     api().invoke<string[]>(IPC.K8sSecretKeys, args),
   dockerContainers: () =>
-    api().invoke<import("@db-mirror/core").docker.DockerContainer[]>(IPC.DockerContainers),
+    api().invoke<dockerTypes.DockerContainer[]>(IPC.DockerContainers),
   dockerContainerEnvs: (containerId: string) =>
     api().invoke<Record<string, string>>(IPC.DockerContainerEnvs, containerId),
   diff: (args: {
@@ -55,4 +60,21 @@ export const rpc = {
     const wrapped = api().on(IPC.DumpProgress, (payload) => cb(payload as string));
     return () => api().off(IPC.DumpProgress, wrapped);
   },
+  onUpdateAvailable: (cb: (info: UpdateAvailableInfo) => void) => {
+    const wrapped = api().on(IPC.UpdateAvailable, (p) => cb(p as UpdateAvailableInfo));
+    return () => api().off(IPC.UpdateAvailable, wrapped);
+  },
+  onUpdateDownloadProgress: (cb: (info: UpdateProgressInfo) => void) => {
+    const wrapped = api().on(IPC.UpdateDownloadProgress, (p) => cb(p as UpdateProgressInfo));
+    return () => api().off(IPC.UpdateDownloadProgress, wrapped);
+  },
+  onUpdateDownloaded: (cb: (info: UpdateDownloadedInfo) => void) => {
+    const wrapped = api().on(IPC.UpdateDownloaded, (p) => cb(p as UpdateDownloadedInfo));
+    return () => api().off(IPC.UpdateDownloaded, wrapped);
+  },
+  onUpdateError: (cb: (info: { message: string }) => void) => {
+    const wrapped = api().on(IPC.UpdateError, (p) => cb(p as { message: string }));
+    return () => api().off(IPC.UpdateError, wrapped);
+  },
+  installUpdate: () => api().invoke<void>(IPC.InstallUpdate),
 };
