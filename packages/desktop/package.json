@@ -4,7 +4,11 @@
   "private": true,
   "type": "module",
   "description": "Drift — MySQL & MariaDB schema and data sync desktop app",
-  "homepage": "https://github.com/derkoenigeu/drift",
+  "homepage": "https://github.com/zebra-group/drift",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/zebra-group/drift.git"
+  },
   "author": {
     "name": "derkoenigeu",
     "email": "jonas.koenig@mindbox.de"
