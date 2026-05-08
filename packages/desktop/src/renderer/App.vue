@@ -34,6 +34,7 @@ onMounted(() => {
   rpc.appVersion().then((v) => { appVersion.value = v; });
   const unsubs = [
     rpc.onUpdateAvailable(({ version }) => {
+      if (updateState.value === "ready") return; // already downloaded, don't regress
       updateVersion.value = version;
       updateState.value = "downloading";
       updateDismissed.value = false;
@@ -46,7 +47,7 @@ onMounted(() => {
       updateState.value = "ready";
     }),
     rpc.onUpdateError(() => {
-      updateState.value = "idle";
+      if (updateState.value !== "ready") updateState.value = "idle";
     }),
   ];
   onUnmounted(() => unsubs.forEach((u) => u()));
